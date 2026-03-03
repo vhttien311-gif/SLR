@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Language Recognition - Complete System Overview</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+        
+        .header p {
+            color: #7f8c8d;
+            font-size: 1.2em;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .tab {
+            background: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            color: #7f8c8d;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .tab:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+        
+        .tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .content {
+            display: none;
+        }
+        
+        .content.active {
+            display: block;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        
+        .card h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+        
+        .pipeline {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .step {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 5px solid #667eea;
+        }
+        
+        .step-number {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+        
+        .step-content h3 {
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+        
+        .step-content p {
+            color: #7f8c8d;
+            line-height: 1.6;
+        }
+        
+        code {
+            background: #f0f0f0;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            color: #e74c3c;
+        }
+        
+        .tech-tag {
+            display: inline-block;
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            margin: 5px 5px 5px 0;
+        }
+        
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .method-card {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            border-radius: 10px;
+            padding: 20px;
+            border: 2px solid #667eea;
+        }
+        
+        .method-card h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+        
+        .method-card ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .method-card li {
+            padding: 8px 0;
+            color: #555;
+        }
+        
+        .method-card li:before {
+            content: "✓ ";
+            color: #27ae60;
+            font-weight: bold;
+            margin-right: 5px;
+        }
+        
+        .architecture-diagram {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            overflow-x: auto;
+        }
+        
+        .flow-chart {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            min-width: 800px;
+            padding: 20px 0;
+        }
+        
+        .flow-box {
+            background: #f8f9fa;
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            padding: 15px 20px;
+            min-width: 120px;
+            text-align: center;
+        }
+        
+        .flow-arrow {
+            font-size: 24px;
+            color: #667eea;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        
+        th {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            color: #2c3e50;
+            font-weight: 600;
+        }
+        
+        tr:hover {
+            background: #f8f9fa;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤟 Sign Language Recognition System</h1>
+            <p>Multi-Stream Architecture: Skeleton + RGB + Feature Fusion</p>
+        </div>
+        
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('overview')">📊 System Overview</button>
+            <button class="tab" onclick="showTab('skeleton')">🦴 Skeleton Stream (GCN)</button>
+            <button class="tab" onclick="showTab('rgb')">🎥 RGB Stream (3D-CNN)</button>
+            <button class="tab" onclick="showTab('comparison')">⚖️ Method Comparison</button>
+            <button class="tab" onclick="showTab('architecture')">🏗️ Complete Architecture</button>
+        </div>
+        
+        <!-- Overview Tab -->
+        <div id="overview" class="content active">
+            <div class="card">
+                <h2>System Overview</h2>
+                <p style="color: #7f8c8d; margin-bottom: 20px;">This system combines three complementary approaches for robust sign language recognition:</p>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value">2000</div>
+                        <div class="stat-label">Sign Classes (WLASL)</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">2</div>
+                        <div class="stat-label">Processing Streams</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">32 or 150</div>
+                        <div class="stat-label">Frames per Sequence</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">27</div>
+                        <div class="stat-label">Skeleton Keypoints</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2>Processing Pipeline</h2>
+                <div class="architecture-diagram">
+                    <div class="flow-chart">
+                        <div class="flow-box" style="background: #e8f5e9;">
+                            <strong>RGB Video</strong><br>
+                            <small>Input Stream</small>
+                        </div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-box" style="background: #fff3e0;">
+                            <strong>Pose Estimation</strong><br>
+                            <small>HRNet by MMPose<br></small>
+                            <small><strong>Graph reduction:</strong> 133 nodes whole-body pose are trimmed to 27 nodes, contains 10 nodes for each hand and 7 nodes for upper body</small>
+                        </div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-box" style="background: ;">
+                            <div class="flow-box" style="background: #e3f2fd;">
+                            <strong>Joint</strong><br>
+
+                                </div>
+                            <div class="flow-box" style="background: #e3f2fd;">
+                            <strong>Bone</strong><br> </div>
+
+                            <div class="flow-box" style="background: #e3f2fd;">
+                            <strong>Joint Motion</strong><br> </div>
+
+                            <div class="flow-box" style="background: #e3f2fd;">
+                            <strong>Bone Motion</strong><br> </div> 
+                            <small><strong>Bone data</strong> generated by representing joint data in a vector form pointing from source joints to their target joints<br><strong>Motion data</strong> are generated by calculating the difference between adjacent frames in both joint and bone streams</small>               
+                        
+                        </div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-box" style="background: #f3e5f5;">
+                            <strong>Sign Language Graph Convolutional Network</strong><br>
+                            <small>VSNet transform</small>
+                        </div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-box" style="background: #e8f5e9;">
+                            <strong>Prediction</strong><br>
+                            <small>2000 Classes<br>1000 Classes<br>300 Classes<br>100 Classes</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="architecture-diagram">
+                    <div class="flow-chart">
+                        <div class="flow-box" style="background: #e8f5e9;">
+                            <strong>RGB Video</strong><br>
+                            <small>Input Stream</small>
+                        </div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-box" style="background: #fff3e0;">
+                            <strong>Video Frame Extraction</strong><br>
+                            <small>All frame of each video</small>
+                        </div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-box" style="background: #e3f2fd;"> 
+                            <strong>Frame Selection</strong><br>
+                            <div style="text-align: left; display: inline-block; width: 100%;">
+                                <small><strong>Target length:</strong> 32 frames<br><strong>Training Stratege:</strong> Randomly select a continuous segment of frames<br><strong>Testing Stratege:</strong> Video divide into 5 segments of equal length</small>
+                            </div>
+                        </div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-box" style="background: #e3f2fd;"> 
+                            <strong>Data Argumentation (Training Only)</strong><br> 
+                            <div style="text-align: left; display: inline-block; width: 100%;">
+                                <small>
+                                    <strong>Horizontal Flip:</strong> 50% probability<br>
+                                    <strong>Random Rotation:</strong> Within a range of &plusmn; 5 degrees<br>
+                                    <strong>Random Cropping:</strong> From 256 &times; 256 down to 224 &times; 224 pixels
+                                </small>
+                            </div>
+                        </div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-box" style="background: #f3e5f5;">
+                            <strong>3D-CNN</strong><br>
+                            <small>ResNet2plus1</small>
+                        </div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-box" style="background: #e8f5e9;">
+                            <strong>Prediction</strong><br>
+                            <small>2000 Classes<br>1000 Classes<br>300 Classes<br>100 Classes</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="comparison-grid" >
+                <div class="method-card" style="background:#ffffff">
+                    <h3>🦴 Skeleton Stream</h3>
+                    <ul>
+                        <li>27 body keypoints</li>
+                        <li>VSFormer architecture</li>
+                        <li>Spatial-temporal attention</li>
+                        <li>Graph convolution (44→36→24)</li>
+                        <li>Robust to background</li>
+                    </ul>
+                </div>
+                
+                <div class="method-card" style="background:#ffffff">
+                    <h3>🎥 RGB Stream</h3>
+                    <ul>
+                        <li>Raw video frames</li>
+                        <li>R(2+1)D CNN</li>
+                        <li>Swish activation</li>
+                        <li>Spatiotemporal decomposition</li>
+                        <li>Captures appearance details</li>
+                    </ul>
+                </div>
+                
+                <div class="method-card"style="background:#ffffff"> 
+                    <h3>🔄 Feature Stream</h3>
+                    <ul>
+                        <li>Hand-crafted features</li>
+                        <li>Separable 3D Conv</li>
+                        <li>Efficient processing</li>
+                        <li>Complementary information</li>
+                        <li>Domain knowledge</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Skeleton Tab -->
+        <div id="skeleton" class="content">
+            <div class="card">
+                <h2>Skeleton-Based Recognition (GCN)</h2>
+                <span class="tech-tag">HRNet</span>
+                <span class="tech-tag">Graph Convolution</span>
+                <span class="tech-tag">Transformer</span>
+                
+                <div class="pipeline">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h3>Pose Estimation (HRNet)</h3>
+                            <p>Extract 27 keypoints from each frame using <code>hrnet_w48_coco_wholebody</code></p>
+                            <p>Output: <code>(T=150, V=27, C=3)</code> where C = (x, y, confidence)</p>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h3>Graph Construction</h3>
+                            <p>Build skeleton graph with adjacency matrix A representing joint connections</p>
+                            <p>Progressive reduction: 44 nodes → 36 nodes → 24 nodes</p>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h3>GCN Processing (3 Layers)</h3>
+                            <p><strong>L1:</strong> TCN_GCN_drop(3 → 64, V=44) + DropBlock</p>
+                            <p><strong>L2:</strong> TCN_GCN_drop(64 → 96, V=36) + DropBlock</p>
+                            <p><strong>L3:</strong> TCN_GCN_drop(96 → 96, V=24) + DropBlock</p>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <h3>VSFormer Blocks (×8)</h3>
+                            <p>Multi-head self-attention with partition size (6, 4)</p>
+                            <p>Parallel GCN + TCN branches</p>
+                            <p>Channel progression: 96 → 192 → 192 → 192</p>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">5</div>
+                        <div class="step-content">
+                            <h3>Classification</h3>
+                            <p>Global pooling over (T, V) dimensions</p>
+                            <p>Fully connected layer: 192 → 100 classes</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2>Key Components</h2>
+                <table>
+                    <tr>
+                        <th>Component</th>
+                        <th>Description</th>
+                        <th>Parameters</th>
+                    </tr>
+                    <tr>
+                        <td>HRNet Extractor</td>
+                        <td>Whole-body pose estimation</td>
+                        <td>27 joints (hands, body, face)</td>
+                    </tr>
+                    <tr>
+                        <td>Graph Reduction</td>
+                        <td>Progressive joint pooling</td>
+                        <td>44 → 36 → 24 nodes</td>
+                    </tr>
+                    <tr>
+                        <td>DropBlock</td>
+                        <td>Spatial-temporal regularization</td>
+                        <td>Skeleton & time dropout</td>
+                    </tr>
+                    <tr>
+                        <td>VSFormer</td>
+                        <td>Spatial-temporal transformer</td>
+                        <td>8 blocks, 32 heads</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        
+        <!-- RGB Tab -->
+        <div id="rgb" class="content">
+            <div class="card">
+                <h2>RGB-Based Recognition (3D-CNN)</h2>
+                <span class="tech-tag">3D CNN</span>
+                <span class="tech-tag">Spatiotemporal Decomposition</span>
+                <span class="tech-tag">Swish Activation</span>
+                
+                <div class="pipeline">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h3>Video Input</h3>
+                            <p>Raw RGB video frames: <code>(C=3, T, H, W)</code></p>
+                            <p>Channels=3 (Red, Green, Blue)</p>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h3>Spatiotemporal Decomposition</h3>
+                            <p><strong>2D Spatial Conv:</strong> Captures hand shapes and poses within each frame</p>
+                            <p><strong>1D Temporal Conv:</strong> Captures movement patterns across frames</p>
+                            <p>Architecture: <code>torchvision.models.video.r2plus1d_18</code></p>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h3>Activation Optimization</h3>
+                            <p>Replace all <code>ReLU</code> with <code>SiLU (Swish)</code></p>
+                            <p>Formula: <code>Swish(x) = x · sigmoid(x)</code></p>
+                            <p>Benefits: Smoother gradients, better learning</p>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <h3>Feature Flattening</h3>
+                            <p>Global spatiotemporal pooling</p>
+                            <p>Flatten to 1D feature vector: <code>out.flatten(1)</code></p>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">5</div>
+                        <div class="step-content">
+                            <h3>Classification Head</h3>
+                            <p>Dropout(p=0.5) for regularization</p>
+                            <p>Linear layer → 100 sign classes</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2>R(2+1)D Architecture Details</h2>
+                <table>
+                    <tr>
+                        <th>Layer Type</th>
+                        <th>Operation</th>
+                        <th>Purpose</th>
+                    </tr>
+                    <tr>
+                        <td>2D Spatial Conv</td>
+                        <td>Conv2D on each frame</td>
+                        <td>Extract spatial features (hand shapes)</td>
+                    </tr>
+                    <tr>
+                        <td>1D Temporal Conv</td>
+                        <td>Conv1D across time</td>
+                        <td>Capture motion dynamics</td>
+                    </tr>
+                    <tr>
+                        <td>Swish Activation</td>
+                        <td>x · sigmoid(x)</td>
+                        <td>Smooth, non-monotonic activation</td>
+                    </tr>
+                    <tr>
+                        <td>Dropout</td>
+                        <td>Random neuron dropout</td>
+                        <td>Prevent overfitting</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Comparison Tab -->
+        <div id="comparison" class="content">
+            <div class="card">
+                <h2>Method Comparison</h2>
+                <table>
+                    <tr>
+                        <th>Aspect</th>
+                        <th>Skeleton (VSFormer)</th>
+                        <th>RGB (R(2+1)D)</th>
+                        <th>Feature Stream</th>
+                    </tr>
+                    <tr>
+                        <td><strong>Input</strong></td>
+                        <td>27 keypoints (x, y, conf)</td>
+                        <td>RGB frames (3×H×W)</td>
+                        <td>Hand-crafted features</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Preprocessing</strong></td>
+                        <td>HRNet pose estimation</td>
+                        <td>Frame normalization</td>
+                        <td>Feature extraction</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Main Architecture</strong></td>
+                        <td>GCN + Transformer</td>
+                        <td>3D CNN (decomposed)</td>
+                        <td>Separable 3D Conv</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Key Strength</strong></td>
+                        <td>Structural understanding</td>
+                        <td>Appearance details</td>
+                        <td>Domain knowledge</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Robustness</strong></td>
+                        <td>Background invariant</td>
+                        <td>Lighting sensitive</td>
+                        <td>Stable features</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Computation</strong></td>
+                        <td>Medium (pose + GCN)</td>
+                        <td>High (3D convolutions)</td>
+                        <td>Low (efficient conv)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Extraction Time</strong></td>
+                        <td>~64 hours</td>
+                        <td>~17 hours</td>
+                        <td>...</td>
+                    </tr>
+                </table>
+            </div>
+            
+            <div class="card">
+                <h2>Fusion Strategy</h2>
+                <div class="pipeline">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h3>Individual Stream Predictions</h3>
+                            <p>Each stream produces probability distribution over 100 classes</p>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h3>Weighted Fusion</h3>
+                            <p><code>Final = α·Skeleton + β·RGB + γ·Feature</code></p>
+                            <p>Weights learned during training or fixed empirically</p>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h3>Ensemble Decision</h3>
+                            <p>Final prediction: <code>argmax(Final)</code></p>
+                            <p>Combines complementary strengths of all streams</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Architecture Tab -->
+        <div id="architecture" class="content">
+            <div class="card">
+                <h2>Complete Multi-Stream Architecture</h2>
+                <div class="architecture-diagram">
+                    <svg width="100%" height="600" viewBox="0 0 1200 600" style="max-width: 100%;">
+                        <!-- Input -->
+                        <rect x="50" y="250" width="120" height="100" fill="#e8f5e9" stroke="#4caf50" stroke-width="2" rx="10"/>
+                        <text x="110" y="295" text-anchor="middle" font-weight="bold">RGB Video</text>
+                        <text x="110" y="315" text-anchor="middle" font-size="12" fill="#666">H×W×T</text>
+                        
+                        <!-- Pose Estimation -->
+                        <rect x="220" y="150" width="120" height="80" fill="#fff3e0" stroke="#ff9800" stroke-width="2" rx="10"/>
+                        <text x="280" y="185" text-anchor="middle" font-weight="bold">Pose</text>
+                        <text x="280" y="205" text-anchor="middle" font-size="12" fill="#666">HRNet</text>
+                        
+                        <!-- Three Streams -->
+                        <!-- Skeleton Stream -->
+                        <rect x="400" y="50" width="140" height="100" fill="#e3f2fd" stroke="#2196f3" stroke-width="2" rx="10"/>
+                        <text x="470" y="85" text-anchor="middle" font-weight="bold">Keypoints</text>
+                        <text x="470" y="105" text-anchor="middle" font-size="12" fill="#666">27 joints</text>
+                        <text x="470" y="125" text-anchor="middle" font-size="12" fill="#666">(T, V, 3)</text>
+                        
+                        <rect x="590" y="50" width="140" height="100" fill="#e8eaf6" stroke="#3f51b5" stroke-width="2" rx="10"/>
+                        <text x="660" y="85" text-anchor="middle" font-weight="bold">GCN</text>
+                        <text x="660" y="105" text-anchor="middle" font-size="11" fill="#666">44→36→24</text>
+                        <text x="660" y="125" text-anchor="middle" font-size="11" fill="#666">VSFormer×8</text>
+                        
+                        <rect x="780" y="50" width="140" height="100" fill="#f3e5f5" stroke="#9c27b0" stroke-width="2" rx="10"/>
+                        <text x="850" y="90" text-anchor="middle" font-weight="bold">Prediction 1</text>
+                        <text x="850" y="115" text-anchor="middle" font-size="12" fill="#666">2000 classes</text>
+                        
+                        <!-- Feature Stream -->
+                        <rect x="400" y="200" width="140" height="100" fill="#e3f2fd" stroke="#2196f3" stroke-width="2" rx="10"/>
+                        <text x="470" y="235" text-anchor="middle" font-weight="bold">Features</text>
+                        <text x="470" y="255" text-anchor="middle" font-size="12" fill="#666">Hand-crafted</text>
+                        
+                        <rect x="590" y="200" width="140" height="100" fill="#e8eaf6" stroke="#3f51b5" stroke-width="2" rx="10"/>
+                        <text x="660" y="235" text-anchor="middle" font-weight="bold">Sep Conv</text>
+                        <text x="660" y="255" text-anchor="middle" font-size="11" fill="#666">Spatial-Temporal</text>
+                        <text x="660" y="275" text-anchor="middle" font-size="11" fill="#666">3D CNN</text>
+                        
+                        <rect x="780" y="200" width="140" height="100" fill="#f3e5f5" stroke="#9c27b0" stroke-width="2" rx="10"/>
+                        <text x="850" y="240" text-anchor="middle" font-weight="bold">Prediction 2</text>
+                        <text x="850" y="265" text-anchor="middle" font-size="12" fill="#666">2000 classes</text>
+                        
+                        <!-- RGB Stream -->
+                        <rect x="400" y="350" width="140" height="100" fill="#e3f2fd" stroke="#2196f3" stroke-width="2" rx="10"/>
+                        <text x="470" y="385" text-anchor="middle" font-weight="bold">RGB</text>
+                        <text x="470" y="405" text-anchor="middle" font-size="12" fill="#666">Raw frames</text>
+                        <text x="470" y="425" text-anchor="middle" font-size="12" fill="#666">(3, T, H, W)</text>
+                        
+                        <rect x="590" y="350" width="140" height="100" fill="#e8eaf6" stroke="#3f51b5" stroke-width="2" rx="10"/>
+                        <text x="660" y="385" text-anchor="middle" font-weight="bold">R(2+1)D</text>
+                        <text x="660" y="405" text-anchor="middle" font-size="11" fill="#666">2D+1D Conv</text>
+                        <text x="660" y="425" text-anchor="middle" font-size="11" fill="#666">Swish</text>
+                        
+                        <rect x="780" y="350" width="140" height="100" fill="#f3e5f5" stroke="#9c27b0" stroke-width="2" rx="10"/>
+                        <text x="850" y="390" text-anchor="middle" font-weight="bold">Prediction 3</text>
+                        <text x="850" y="415" text-anchor="middle" font-size="12" fill="#666">2000 classes</text>
+                        
+                        <!-- Fusion -->
+                        <!--
+                        <rect x="970" y="200" width="140" height="100" fill="#e8f5e9" stroke="#4caf50" stroke-width="3" rx="10"/>
+                        <text x="1040" y="235" text-anchor="middle" font-weight="bold" font-size="16">FUSION</text>
+                        <text x="1040" y="260" text-anchor="middle" font-size="12" fill="#666">Weighted</text>
+                        <text x="1040" y="280" text-anchor="middle" font-size="12" fill="#666">Combination</text>
+                        -->
+
+                        
+                        <!-- Arrows -->
+                        <!-- Input to Pose -->
+                        <path d="M 170 300 L 220 190" stroke="#666" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+                        
+                        <!-- Pose to Keypoints -->
+                        <path d="M 340 190 L 400 100" stroke="#666" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+                        
+                        <!-- Pose to Features -->
+                        <path d="M 340 190 L 400 250" stroke="#666" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+                        
+                        <!-- Input to RGB -->
+                        <path d="M 170 300 L 400 400" stroke="#666" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+                        
+                        <!-- Stream processing arrows -->
+                        <line x1="540" y1="100" x2="590" y2="100" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+                        <line x1="540" y1="250" x2="590" y2="250" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+                        <line x1="540" y1="400" x2="590" y2="400" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+                        
+                        <line x1="730" y1="100" x2="780" y2="100" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+                        <line x1="730" y1="250" x2="780" y2="250" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+                        <line x1="730" y1="400" x2="780" y2="400" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+                        
+                        <!-- To fusion -->
+                        <path d="M 920 100 L 970 230" stroke="#666" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+                        <line x1="920" y1="250" x2="970" y2="250" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+                        <path d="M 920 400 L 970 270" stroke="#666" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+                        
+                        <!-- Arrow marker definition -->
+                        <defs>
+                            <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                                <polygon points="0 0, 10 3, 0 6" fill="#666"/>
+                            </marker>
+                        </defs>
+                    </svg>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2>Implementation Details</h2>
+                <table>
+                    <tr>
+                        <th>Component</th>
+                        <th>Framework/Library</th>
+                        <th>Key Parameters</th>
+                    </tr>
+                    <tr>
+                        <td>Pose Estimation</td>
+                        <td>MMPose / HRNet</td>
+                        <td>hrnet_w48_coco_wholebody</td>
+                    </tr>
+                    <tr>
+                        <td>Skeleton GCN</td>
+                        <td>PyTorch</td>
+                        <td>3 layers, dropout, batch_size=16</td>
+                    </tr>
+                    <tr>
+                        <td>VSFormer</td>
+                        <td>Custom PyTorch</td>
+                        <td>8 blocks, 32 heads, partition (6,4)</td>
+                    </tr>
+                    <tr>
+                        <td>R(2+1)D</td>
+                        <td>torchvision.models.video</td>
+                        <td>r2plus1d_18, Swish activation</td>
+                    </tr>
+                    <tr>
+                        <td>Optimizer</td>
+                        <td>Adam</td>
+                        <td>lr=0.0005, epochs=100</td>
+                    </tr>
+                    <tr>
+                        <td>Loss Function</td>
+                        <td>CrossEntropyLoss</td>
+                        <td>Multi-class classification</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function showTab(tabName) {
+            // Hide all content
+            const contents = document.querySelectorAll('.content');
+            contents.forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Remove active class from all tabs
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected content
+            document.getElementById(tabName).classList.add('active');
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+</html>
